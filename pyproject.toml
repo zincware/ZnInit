@@ -1,0 +1,45 @@
+[tool.poetry]
+name = "zninit"
+version = "0.1.0"
+description = "Descriptor based dataclass implementation"
+authors = ["zincwarecode <zincwarecode@gmail.com>"]
+license = "Apache-2.0"
+keywords = ["dataclass", "descriptor"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.1.3"
+black = "^22.8.0"
+isort = "^5.10.1"
+jupyterlab = "^3.4.7"
+coverage = "^6.4.4"
+flake8 = "^5.0.4"
+pylint = "^2.15.2"
+perflint = "^0.7.3"
+pre-commit = "^2.20.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 90
+preview = true
+
+[tool.isort]
+profile = 'black'
+multi_line_output = 3
+
+[tool.pylint.messages_control]
+
+max-line-length = 90
+
+disable = [
+    "logging-fstring-interpolation",
+    "use-list-copy", # I do not understand this one
+    "fixme", # allow for open TODOs
+]
