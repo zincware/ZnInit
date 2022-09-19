@@ -1,5 +1,5 @@
 [![Coverage Status](https://coveralls.io/repos/github/zincware/ZnInit/badge.svg?branch=main)](https://coveralls.io/github/zincware/ZnInit?branch=main)
-![PyTest](https://github.com/zincware/ZnTrack/actions/workflows/pytest.yaml/badge.svg)
+![PyTest](https://github.com/zincware/ZnInit/actions/workflows/pytest.yaml/badge.svg)
 [![PyPI version](https://badge.fury.io/py/zninit.svg)](https://badge.fury.io/py/zninit)
 [![code-style](https://img.shields.io/badge/code%20style-black-black)](https://github.com/psf/black/)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/zincware/ZnInit/HEAD)
