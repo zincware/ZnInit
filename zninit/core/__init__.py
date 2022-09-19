@@ -11,10 +11,6 @@ from zninit.descriptor import Descriptor, Empty, get_descriptors
 log = logging.getLogger(__name__)
 
 
-# TODO write more tests for inheritance and TypeError(super.__)
-# TODO write tests for positional only arguments
-
-
 def get_args_type_error(args: list, cls_name: str, uses_auto_init: bool) -> TypeError:
     """Get a TypeError of args are used instead of kwargs"""
     if uses_auto_init:
@@ -84,7 +80,6 @@ def get_auto_init(
 
     def auto_init(self, *args, **kwargs):
         """Wrapper for the __init__"""
-        # TODO accept args and raise custom error
         init_kwargs = {}
         required_keys = []
         uses_auto_init = getattr(self.__init__, "uses_auto_init", False)
@@ -131,27 +126,36 @@ class ZnInit:
         This also supports subclasses of Descriptor.
     use_repr: bool
         Generate an automatic, dataclass like representation string.
+    init_subclass_basecls: object
+        Any class (not an instance) that acts as the lower bound for searching an
+        __init__ method. If the __init__ of this class is reached when iterating
+        over the mro, an automatic __init__ method will be generated and the
+        __init__ of the basecls will be called via super.
     """
 
     init_descriptors: typing.List[Descriptor] = [Descriptor]
     use_repr: bool = True
+    init_subclass_basecls = None
 
-    def __init_subclass__(cls, basecls=None, **kwargs):
+    def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        if basecls is None:
-            basecls = ZnInit
+        if cls.init_subclass_basecls is None:
+            cls.init_subclass_basecls = ZnInit
         for inherited in cls.__mro__:
-            # Go through the mro until you find the Node class.
+            # Go through the mro until you find the init_subclass_basecls.
             # If found an init before that class it will implement super
             # if not add the fields to the __init__ automatically.
-            if inherited == basecls:
+            if inherited == cls.init_subclass_basecls:
                 break
+
             if inherited.__dict__.get("__init__") is not None:
                 if not getattr(inherited.__init__, "uses_auto_init", False):
                     return cls
 
-        log.debug(f"Found {basecls} instance - adding dataclass-like __init__")
-        return cls._update_init(super_init=basecls.__init__)
+        log.debug(
+            f"Found {cls.init_subclass_basecls} instance - adding dataclass-like __init__"
+        )
+        return cls._update_init(super_init=cls.init_subclass_basecls.__init__)
 
     @classmethod
     def _get_descriptors(cls):

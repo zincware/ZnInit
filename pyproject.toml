@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "zninit"
-version = "0.1.0"
+version = "0.1.1"
 description = "Descriptor based dataclass implementation"
 authors = ["zincwarecode <zincwarecode@gmail.com>"]
 license = "Apache-2.0"
@@ -41,5 +41,4 @@ max-line-length = 90
 disable = [
     "logging-fstring-interpolation",
     "use-list-copy", # I do not understand this one
-    "fixme", # allow for open TODOs
 ]
