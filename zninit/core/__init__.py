@@ -258,6 +258,6 @@ class ZnInit:
         """Implement if cmds after the automatically generated __init__ should be run
 
         This only works if no __init__ is defined and the automatically generated
-        __init__ from ZnTrack is used.
+        __init__ is used.
         """
         raise AttributeError(f"'{self}' object has no attribute 'post_init'")
