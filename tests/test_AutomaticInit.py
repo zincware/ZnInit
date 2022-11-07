@@ -86,12 +86,12 @@ def test_ChildPlainCls():
     with pytest.raises(TypeError) as err:
         _ = ChildPlainCls(q=10)
 
-    assert err.value.args[0] == "ZnInit.__init__() got an unexpected keyword argument 'q'"
+    assert err.value.args[0].endswith("__init__() got an unexpected keyword argument 'q'")
 
     with pytest.raises(TypeError) as err:
         _ = ChildPlainCls(parameter=10, q=10)
 
-    assert err.value.args[0] == "ZnInit.__init__() got an unexpected keyword argument 'q'"
+    assert err.value.args[0].endswith("__init__() got an unexpected keyword argument 'q'")
 
     child = ChildPlainCls(parameter=10)
     assert child.parameter == 10
