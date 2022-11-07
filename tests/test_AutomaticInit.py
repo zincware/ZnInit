@@ -83,6 +83,16 @@ def test_ChildPlainCls():
         == "ChildPlainCls.__init__() takes 1 positional argument but 2 were given"
     )
 
+    with pytest.raises(TypeError) as err:
+        _ = ChildPlainCls(q=10)
+
+    assert err.value.args[0] == "ZnInit.__init__() got an unexpected keyword argument 'q'"
+
+    with pytest.raises(TypeError) as err:
+        _ = ChildPlainCls(parameter=10, q=10)
+
+    assert err.value.args[0] == "ZnInit.__init__() got an unexpected keyword argument 'q'"
+
     child = ChildPlainCls(parameter=10)
     assert child.parameter == 10
 

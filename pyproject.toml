@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "zninit"
-version = "0.1.1"
+version = "0.1.2"
 description = "Descriptor based dataclass implementation"
 authors = ["zincwarecode <zincwarecode@gmail.com>"]
 license = "Apache-2.0"
@@ -21,6 +21,7 @@ flake8 = "^5.0.4"
 pylint = "^2.15.2"
 perflint = "^0.7.3"
 pre-commit = "^2.20.0"
+ruff = "^0.0.105"
 
 [build-system]
 requires = ["poetry-core"]
@@ -45,3 +46,6 @@ disable = [
     "logging-fstring-interpolation",
     "use-list-copy", # I do not understand this one
 ]
+
+[tool.ruff]
+line-length = 90

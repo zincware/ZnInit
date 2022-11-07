@@ -1,6 +1,7 @@
 """Functionality to generate the automatic __init__"""
 from __future__ import annotations
 
+import contextlib
 import logging
 import typing
 from copy import deepcopy
@@ -84,7 +85,7 @@ def get_auto_init(
         required_keys = []
         uses_auto_init = getattr(self.__init__, "uses_auto_init", False)
         cls_name = self.__class__.__name__
-        if len(args) > 0:
+        if args:
             raise get_args_type_error(args, cls_name, uses_auto_init)
         log.debug(f"The '__init__' uses auto_init: {uses_auto_init}")
         for kwarg_name in kwargs_no_default:
@@ -93,22 +94,20 @@ def get_auto_init(
             except KeyError:
                 required_keys.append(kwarg_name)
 
-        if len(required_keys) > 0:
-            raise get_init_type_error(required_keys, cls_name, uses_auto_init)
-
         init_kwargs.update(
             {name: kwargs.pop(name, value) for name, value in kwargs_with_default.items()}
         )
-
         super_init(self, **kwargs)  # call the super_init explicitly instead of super
         # must call the super_init first e.g. it is required to set the node_name
+
+        # raise required keywords after unexpected keywords
+        if required_keys:
+            raise get_init_type_error(required_keys, cls_name, uses_auto_init)
         for key, value in init_kwargs.items():
             setattr(self, key, value)
 
-        try:
+        with contextlib.suppress(AttributeError):
             self.post_init()
-        except AttributeError:
-            pass
 
     # we add this attribute to the __init__ to make it identifiable
     auto_init.uses_auto_init = True
@@ -136,6 +135,16 @@ class ZnInit:
     init_descriptors: typing.List[Descriptor] = [Descriptor]
     use_repr: bool = True
     init_subclass_basecls = None
+
+    def __init__(self):
+        """Required for Error messages
+
+        Otherwise, it would just raise 'object.__init__() takes exactly one argument'
+
+        Raises
+        ------
+        TypeError: ZnInit.__init__() got an unexpected keyword argument ...
+        """
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
