@@ -26,6 +26,9 @@ pre-commit = "^2.20.0"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.poetry.urls]
+repository = "https://github.com/zincware/ZnInit"
+
 [tool.black]
 line-length = 90
 preview = true
