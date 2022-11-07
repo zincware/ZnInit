@@ -7,6 +7,19 @@ import typing
 from copy import deepcopy
 from inspect import Parameter, Signature
 
+try:
+    from typing import dataclass_transform  # pylint: disable=no-name-in-module
+except ImportError:
+
+    def dataclass_transform():
+        """Empty decorator for Python < 3.11 support"""
+
+        def decorator(func):
+            return func
+
+        return decorator
+
+
 from zninit.descriptor import Descriptor, Empty, get_descriptors
 
 log = logging.getLogger(__name__)
@@ -89,9 +102,9 @@ def get_auto_init(
             raise get_args_type_error(args, cls_name, uses_auto_init)
         log.debug(f"The '__init__' uses auto_init: {uses_auto_init}")
         for kwarg_name in kwargs_no_default:
-            try:  # pylint: disable=loop-try-except-usage
+            if kwarg_name in kwargs:
                 init_kwargs[kwarg_name] = kwargs.pop(kwarg_name)
-            except KeyError:
+            else:
                 required_keys.append(kwarg_name)
 
         init_kwargs.update(
@@ -115,6 +128,7 @@ def get_auto_init(
     return auto_init
 
 
+@dataclass_transform()
 class ZnInit:
     """Parent class for automatic __init__ generation based on descriptrs
 
