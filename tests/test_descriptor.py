@@ -1,32 +1,41 @@
+"""Test ZnInit descriptors."""
 import pytest
 
 from zninit import Descriptor, get_descriptors
 
 
 class ExampleCls:
+    """Example class."""
+
     desc = Descriptor()
 
 
 class ExampleChild(ExampleCls):
+    """Example Child."""
+
     pass
 
 
 def test_get_descriptor():
+    """ZnInit test."""
     assert isinstance(ExampleCls.desc, Descriptor)
 
 
 def test_descriptor_name():
+    """ZnInit test."""
     descriptor = ExampleCls.desc
     assert descriptor.name == "desc"
 
 
 def test_descriptor_owner():
+    """ZnInit test."""
     descriptor = ExampleCls.desc
     assert descriptor.owner == ExampleCls
 
 
 @pytest.mark.parametrize("access", ("get", "set"))
 def test_get_instance(access):
+    """ZnInit test."""
     desc = ExampleCls.desc
 
     cls = ExampleCls()
@@ -40,6 +49,7 @@ def test_get_instance(access):
 
 
 def test_descriptor_set():
+    """ZnInit test."""
     desc = ExampleCls.desc
     cls = ExampleCls()
     cls.desc = 42
@@ -47,6 +57,7 @@ def test_descriptor_set():
 
 
 def test_descriptor_get():
+    """ZnInit test."""
     desc = ExampleCls.desc
     cls = ExampleCls()
     cls.__dict__[desc.name] = 42
@@ -55,17 +66,20 @@ def test_descriptor_get():
 
 @pytest.mark.parametrize("cls", (ExampleCls, ExampleChild))
 def test_get_descriptors_cls(cls):
+    """ZnInit test."""
     instance = cls
     assert get_descriptors(Descriptor, cls=instance) == [cls.desc]
 
 
 @pytest.mark.parametrize("cls", (ExampleCls, ExampleChild))
 def test_get_descriptors_self(cls):
+    """ZnInit test."""
     self = cls()
     assert get_descriptors(Descriptor, self=self) == [cls.desc]
 
 
 def test_get_descriptors_exceptions():
+    """ZnInit test."""
     with pytest.raises(ValueError):
         get_descriptors(Descriptor)
 
@@ -77,14 +91,20 @@ def test_get_descriptors_exceptions():
 
 
 class CustomDescriptor1(Descriptor):
+    """ZnInit descriptor."""
+
     pass
 
 
 class CustomDescriptor2(Descriptor):
+    """ZnInit descriptor."""
+
     pass
 
 
 class MultipleDescriptors:
+    """ZnInit Descriptor container."""
+
     desc1_1 = CustomDescriptor1()
     desc1_2 = CustomDescriptor1()
 
@@ -93,6 +113,7 @@ class MultipleDescriptors:
 
 
 def test_get_custom_descriptors():
+    """ZnInit test."""
     cls = MultipleDescriptors
     assert get_descriptors(Descriptor, cls=cls) == [
         cls.desc1_1,
@@ -115,6 +136,7 @@ def test_get_custom_descriptors():
 
 
 def test_get_desc_values():
+    """ZnInit test."""
     self = MultipleDescriptors()
 
     self.desc1_1 = "Hello"

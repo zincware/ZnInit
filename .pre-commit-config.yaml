@@ -13,11 +13,11 @@ repos:
     hooks:
       - id: isort
 
-  - repo: https://gitlab.com/pycqa/flake8
-    rev: 5.0.4
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.0.126
     hooks:
-      - id: flake8
-        additional_dependencies: [flake8-isort]
+      - id: ruff
+
 
   - repo: local
     hooks:

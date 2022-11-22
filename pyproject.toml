@@ -17,11 +17,10 @@ black = "^22.8.0"
 isort = "^5.10.1"
 jupyterlab = "^3.4.7"
 coverage = "^6.4.4"
-flake8 = "^5.0.4"
 pylint = "^2.15.2"
 perflint = "^0.7.3"
 pre-commit = "^2.20.0"
-ruff = "^0.0.105"
+ruff = "^0.0.126"
 
 [build-system]
 requires = ["poetry-core"]
@@ -49,3 +48,31 @@ disable = [
 
 [tool.ruff]
 line-length = 90
+
+select = ["E", "F", "D", "N", "C"] #, "ANN"]
+extend-ignore = [
+    "D213", "D203", "N802"
+]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+    "tmp",
+]
