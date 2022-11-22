@@ -1,4 +1,4 @@
-"""Functionality to generate the automatic __init__"""
+"""Functionality to generate the automatic __init__."""
 from __future__ import annotations
 
 import contextlib
@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 
 
 def get_args_type_error(args: list, cls_name: str, uses_auto_init: bool) -> TypeError:
-    """Get a TypeError of args are used instead of kwargs"""
+    """Get a TypeError of args are used instead of kwargs."""
     if uses_auto_init:
         return TypeError(
             f"{cls_name}.__init__() takes 1 positional argument but {len(args) + 1} were"
@@ -28,7 +28,7 @@ def get_args_type_error(args: list, cls_name: str, uses_auto_init: bool) -> Type
 def get_init_type_error(
     required_keys: list, cls_name: str, uses_auto_init: bool
 ) -> TypeError:
-    """Get a TypeError similar to a wrong __init__"""
+    """Get a TypeError similar to a wrong __init__."""
     if len(required_keys) == 1:
         if uses_auto_init:
             return TypeError(
@@ -60,7 +60,7 @@ def get_auto_init(
     kwargs_with_default: dict,
     super_init: typing.Callable,
 ):
-    """Automatically create an __init__ based on fields
+    """Automatically create an __init__ based on fields.
 
     Parameters
     ----------
@@ -75,12 +75,11 @@ def get_auto_init(
     super_init: Callable
         typically this is Node.__init__
     """
-
     kwargs_no_default = [] if kwargs_no_default is None else kwargs_no_default
     kwargs_with_default = {} if kwargs_with_default is None else kwargs_with_default
 
     def auto_init(self, *args, **kwargs):
-        """Wrapper for the __init__"""
+        """Wrapper for the __init__."""
         init_kwargs = {}
         required_keys = []
         uses_auto_init = getattr(self.__init__, "uses_auto_init", False)
@@ -116,10 +115,10 @@ def get_auto_init(
 
 
 class ZnInit:
-    """Parent class for automatic __init__ generation based on descriptrs
+    """Parent class for automatic __init__ generation based on descriptors.
 
     Attributes
-    -----------
+    ----------
     init_descriptors: list
         A list of the descriptor classes to be added to the init.
         This also supports subclasses of Descriptor.
@@ -137,7 +136,7 @@ class ZnInit:
     init_subclass_basecls = None
 
     def __init__(self):
-        """Required for Error messages
+        """Required for Error messages.
 
         Otherwise, it would just raise 'object.__init__() takes exactly one argument'
 
@@ -172,12 +171,14 @@ class ZnInit:
 
     @classmethod
     def _update_init(cls, super_init):
-        """Set the automatic __init__
+        """Set the automatic __init__.
 
         Parameters
         ----------
-        cls: the cls to be updated
-        super_init: run a super call if required
+        cls:
+            the cls to be updated
+        super_init:
+            run a super call if required
 
         Returns
         -------
@@ -202,13 +203,9 @@ class ZnInit:
 
     @classmethod
     def _get_auto_init_kwargs(cls) -> (list, dict):
-        """Get the keywords for the __init__
+        """Get the keywords for the __init__.
 
         Collect keywords with and without default values for the init
-
-        Returns
-        -------
-
         """
         kwargs_no_default = []
         kwargs_with_default = {}
@@ -224,10 +221,12 @@ class ZnInit:
 
     @classmethod
     def _get_auto_init_signature(cls) -> (list, dict, list):
-        """Iterate over ZnTrackOptions in the __dict__ and save the option name
+        """Iterate over ZnTrackOptions in the __dict__ and save the option name.
+
         and create a signature Parameter
 
-        Returns:
+        Returns
+        -------
             kwargs_no_default: list
                 a list of names that will be converted to kwargs
             kwargs_with_default: dict
@@ -250,7 +249,7 @@ class ZnInit:
         return signature_params
 
     def __repr__(self):
-        """Get a dataclass like representation of the ZnInit class"""
+        """Get a dataclass like representation of the ZnInit class."""
         if not self.use_repr:
             return super().__repr__()
         repr_str = f"{self.__class__.__name__}("
@@ -264,7 +263,7 @@ class ZnInit:
         return repr_str
 
     def post_init(self):
-        """Implement if cmds after the automatically generated __init__ should be run
+        """Implement if cmds after the automatically generated __init__ should be run.
 
         This only works if no __init__ is defined and the automatically generated
         __init__ is used.

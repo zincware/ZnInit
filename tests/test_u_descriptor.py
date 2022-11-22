@@ -1,11 +1,14 @@
+"""Unit tests for 'ZnInit'."""
 import pytest
 
 from zninit import Descriptor, get_descriptors
 
 
 class CustomDescriptor(Descriptor):
+    """Custom Descriptor."""
+
     def __get__(self, instance, owner=None):
-        """Get from instance.__dict__"""
+        """Get from instance.__dict__."""
         self._instance = instance
         # Test the following part missing
         # if instance is None:
@@ -14,10 +17,13 @@ class CustomDescriptor(Descriptor):
 
 
 class ExampleClass:
+    """Example class with custom descriptor."""
+
     param1 = CustomDescriptor()
 
 
 def test_get_descriptor_err():
+    """Zninit test."""
     with pytest.raises(AttributeError) as err:
         _ = get_descriptors(cls=ExampleClass)
     assert err.value.args[0].startswith(

@@ -1,3 +1,4 @@
+"""Test for the automatic __init__."""
 import pytest
 
 from zninit import Descriptor, ZnInit
@@ -6,45 +7,64 @@ from zninit import Descriptor, ZnInit
 
 
 class Params(Descriptor):
+    """Descriptor child."""
+
     pass
 
 
 class Outs(Descriptor):
+    """Descriptor child."""
+
     pass
 
 
 class SingleClsDefaults(ZnInit):
+    """ZnInit child."""
+
     param1 = Descriptor()
     param2 = Descriptor("World")
 
 
 class ParentClsPlain(ZnInit):
-    """A parent class without any changes"""
+    """A parent class without any changes."""
 
 
 class ChildPlainCls(ParentClsPlain):
+    """ZnInit child."""
+
     parameter: int = Params()
 
 
 class ChildPlainClsInit(ParentClsPlain):
+    """ZnInit child."""
+
     def __init__(self, parameter):
+        """Define __init__."""
         super().__init__()
         self.parameter = parameter
 
 
 class ParentCls(ZnInit):
+    """ZnInit child."""
+
     parameter: int = Params()
 
 
 class DefaultIsNone(ZnInit):
+    """ZnInit child."""
+
     parameter: int = Descriptor(None)
 
 
 class ChildCls(ParentCls):
+    """ZnInit child."""
+
     pass
 
 
 class OnlyParamsInInit(ZnInit):
+    """ZnInit child."""
+
     init_descriptors = [Params]
 
     parameter: int = Params()
@@ -52,7 +72,10 @@ class OnlyParamsInInit(ZnInit):
 
 
 class ChildClsInit(ParentCls):
+    """ZnInit child."""
+
     def __init__(self, parameter, value):
+        """Define __init__."""
         super().__init__(
             parameter=parameter
         )  # super(ChildClsInit, self).__init__ does not work!
@@ -60,12 +83,14 @@ class ChildClsInit(ParentCls):
 
 
 def test_ParentClsPlain():
+    """ZnInit Test."""
     _ = ParentClsPlain()
     with pytest.raises(TypeError):
         _ = ParentClsPlain(paramter=10)
 
 
 def test_ChildPlainCls():
+    """ZnInit Test."""
     with pytest.raises(TypeError) as err:
         _ = ChildPlainCls()
 
@@ -98,11 +123,13 @@ def test_ChildPlainCls():
 
 
 def test_ChildPlainClsInit():
+    """ZnInit Test."""
     x = ChildPlainClsInit(parameter=10)
     assert x.parameter == 10
 
 
 def test_ParentCls():
+    """ZnInit Test."""
     with pytest.raises(TypeError) as err:
         _ = ParentCls()
 
@@ -116,6 +143,7 @@ def test_ParentCls():
 
 
 def test_ChildCls():
+    """ZnInit Test."""
     with pytest.raises(TypeError) as err:
         _ = ChildCls()
 
@@ -129,12 +157,14 @@ def test_ChildCls():
 
 
 def test_ChildClsInit():
+    """ZnInit Test."""
     child = ChildClsInit(parameter=10, value=5)
     assert child.parameter == 10
     assert child.value == 5
 
 
 def test_SingleClsDefaults():
+    """ZnInit Test."""
     instance = SingleClsDefaults(param1="Hello")
     assert instance.param1 + " " + instance.param2 == "Hello World"
 
@@ -143,6 +173,7 @@ def test_SingleClsDefaults():
 
 
 def test_DefaultIsNone():
+    """ZnInit Test."""
     instance = DefaultIsNone()
     assert instance.parameter is None
     instance = DefaultIsNone(parameter=42)
@@ -150,6 +181,7 @@ def test_DefaultIsNone():
 
 
 def test_OnlyParamsInInit():
+    """ZnInit Test."""
     instance = OnlyParamsInInit(parameter=10)
     assert instance.parameter == 10
     with pytest.raises(AttributeError):

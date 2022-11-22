@@ -1,9 +1,9 @@
-"""Definition and utils for the Descriptor class"""
+"""Definition and utils for the Descriptor class."""
 import typing
 
 
 class Empty:  # pylint: disable=too-few-public-methods
-    """ZnInit Version of None to distinguish default version from None
+    """ZnInit Version of None to distinguish default version from None.
 
     When checking if something has a default we can not use 'value is None'
     because 'None' could be the default. Therefore, we use 'value is zninit.Empty'
@@ -11,7 +11,7 @@ class Empty:  # pylint: disable=too-few-public-methods
 
 
 class Descriptor:
-    """Simple Python Descriptor that allows adding
+    """Simple Python Descriptor that allows adding.
 
     This class allows to add metadata to arbitrary class arguments:
 
@@ -21,7 +21,6 @@ class Descriptor:
 
     Examples
     --------
-
     >>> from zninit.descriptor import Descriptor
     >>>
     >>> class MyDescriptor(Descriptor):
@@ -41,10 +40,16 @@ class Descriptor:
     def __init__(
         self, default=Empty, owner=None, instance=None, name="", use_repr: bool = True
     ):  # pylint: disable=too-many-arguments
-        """Define a Descriptor object
+        """Define a Descriptor object.
 
         Parameters
         ----------
+        owner:
+            overwrite Descriptor owner
+        instance:
+            overwrite Descriptor instance
+        name: str
+            overwrite Descriptor name
         default:
             Any default value to __get__ if the __set__ was never called.
         use_repr: bool, default=True
@@ -59,31 +64,31 @@ class Descriptor:
 
     @property
     def name(self):
-        """Property for the name attribute to protect changing it"""
+        """Property for the name attribute to protect changing it."""
         return self._name
 
     @property
     def owner(self):
-        """Property for the owner attribute to protect changing it"""
+        """Property for the owner attribute to protect changing it."""
         return self._owner
 
     @property
     def instance(self):
-        """Property for the instance attribute to protect changing it"""
+        """Property for the instance attribute to protect changing it."""
         return self._instance
 
     @property
     def default(self):
-        """Property for the default attribute to protect changing it"""
+        """Property for the default attribute to protect changing it."""
         return self._default
 
     def __set_name__(self, owner, name):
-        """Store name of the descriptor in the parent class"""
+        """Store name of the descriptor in the parent class."""
         self._owner = owner
         self._name = name
 
     def __get__(self, instance, owner=None):
-        """Get from instance.__dict__
+        """Get from instance.__dict__.
 
         Raises
         ------
@@ -100,7 +105,7 @@ class Descriptor:
         return value
 
     def __set__(self, instance, value):
-        """Save value to instance.__dict__"""
+        """Save value to instance.__dict__."""
         self._instance = instance
         instance.__dict__[self.name] = value
 
@@ -109,7 +114,7 @@ DescriptorTypeT = typing.TypeVar("DescriptorTypeT", bound=Descriptor)
 
 
 def check_descriptor_in_lst(descriptor, descriptor_lst: list) -> bool:
-    """Return True if the descriptor appears in given list of descriptors"""
+    """Return True if the descriptor appears in given list of descriptors."""
     for allowed_descriptor in descriptor_lst:
         if isinstance(descriptor, allowed_descriptor):
             return True
@@ -119,13 +124,16 @@ def check_descriptor_in_lst(descriptor, descriptor_lst: list) -> bool:
 def get_descriptors(
     descriptor=Descriptor, *, self=None, cls=None
 ) -> typing.List[DescriptorTypeT]:
-    """Get a list of all descriptors inheriting from "descriptor"
+    """Get a list of all descriptors inheriting from "descriptor".
 
     Parameters
     ----------
-    cls: any python class
-    self: any python class instance
-    descriptor: any object inheriting from descriptor
+    cls:
+        any python class
+    self:
+        any python class instance
+    descriptor:
+        any object inheriting from descriptor
 
     Returns
     -------
