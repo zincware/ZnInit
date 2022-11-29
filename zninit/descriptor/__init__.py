@@ -1,5 +1,13 @@
 """Definition and utils for the Descriptor class."""
+from __future__ import annotations
+
+import contextlib
+import functools
+import sys
 import typing
+
+with contextlib.suppress(ImportError):
+    import typeguard
 
 
 class Empty:  # pylint: disable=too-few-public-methods
@@ -38,7 +46,13 @@ class Descriptor:
     """
 
     def __init__(
-        self, default=Empty, owner=None, instance=None, name="", use_repr: bool = True
+        self,
+        default=Empty,
+        owner=None,
+        instance=None,
+        name="",
+        use_repr: bool = True,
+        check_types: bool = False,
     ):  # pylint: disable=too-many-arguments
         """Define a Descriptor object.
 
@@ -55,12 +69,19 @@ class Descriptor:
         use_repr: bool, default=True
             This information is used by the ZnInit.__repr__ to check if this
             descriptor should be used in the __repr__ string.
+        check_types: bool, default=False
+            Check the type when using __set__ against the type annotation.
         """
         self._default = default
         self._owner = owner
         self._instance = instance
         self._name = name
         self.use_repr = use_repr
+        self.check_types = check_types
+        if check_types and ("typeguard" not in sys.modules):
+            raise ImportError(
+                "Need to install 'pip install zninit[typeguard]' for type checking."
+            )
 
     @property
     def name(self):
@@ -81,6 +102,28 @@ class Descriptor:
     def default(self):
         """Property for the default attribute to protect changing it."""
         return self._default
+
+    @functools.cached_property
+    def annotation(self):
+        """Get the annotation from the owner.
+
+        Raises
+        ------
+        KeyError:
+            if type checking and the descriptor has no annotation.
+        """
+        try:
+            annotations = self.owner.__annotations__
+        except AttributeError:
+            annotations = {}
+
+        if self.check_types:
+            if self.name not in annotations:
+                raise KeyError(
+                    f"Could not find 'annotation' for {self.name} in '{self.owner}' with"
+                    " 'check_types=True'"
+                )
+        return annotations.get(self.name)
 
     def __set_name__(self, owner, name):
         """Store name of the descriptor in the parent class."""
@@ -106,6 +149,10 @@ class Descriptor:
 
     def __set__(self, instance, value):
         """Save value to instance.__dict__."""
+        if self.check_types:
+            typeguard.check_type(
+                argname=self.name, value=value, expected_type=self.annotation
+            )
         self._instance = instance
         instance.__dict__[self.name] = value
 
