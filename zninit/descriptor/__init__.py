@@ -105,16 +105,25 @@ class Descriptor:
 
     @functools.cached_property
     def annotation(self):
-        """Get the annotation from the owner."""
+        """Get the annotation from the owner.
+
+        Raises
+        ------
+        KeyError:
+            if type checking and the descriptor has no annotation.
+        """
+        try:
+            annotations = self.owner.__annotations__
+        except AttributeError:
+            annotations = {}
+
         if self.check_types:
-            try:
-                return self._owner.__annotations__[self.name]
-            except KeyError as err:
+            if self.name not in annotations:
                 raise KeyError(
                     f"Could not find 'annotation' for {self.name} in '{self.owner}' with"
                     " 'check_types=True'"
-                ) from err
-        return self.owner.__annotations__.get(self.name)
+                )
+        return annotations.get(self.name)
 
     def __set_name__(self, owner, name):
         """Store name of the descriptor in the parent class."""

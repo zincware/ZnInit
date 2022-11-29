@@ -54,6 +54,9 @@ def test_check_type_no_annotation():
     instance = ClsWithoutAnnotations()
 
     with pytest.raises(KeyError):
+        ClsWithoutAnnotations.empty.annotation
+
+    with pytest.raises(KeyError):
         instance.empty = "Not empty"
 
 
@@ -89,6 +92,11 @@ def test_check_type():
 
     with pytest.raises(TypeError):
         _ = instance.number = "5.0"
+
+    assert ClsWithAnnotations.empty.annotation == bool
+    assert ClsWithAnnotations.iterable.annotation == collections.abc.Iterable
+    assert ClsWithAnnotations.list_bool.annotation == typing.List[bool]
+    assert ClsWithAnnotations.number.annotation == typing.Union[int, float]
 
 
 def test_no_typeguard():
