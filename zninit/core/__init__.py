@@ -114,31 +114,7 @@ def get_auto_init(
     return auto_init
 
 
-def update_attribute_names(cls):
-    """Update changed attribute names.
-
-    E.g. 'init_descriptors' was renamed to '_init_descriptors_' but should be
-    backwards compatible. This was done according to PEP8 style guide where
-     '_single_leading_underscore' are meant for weak internal usage.
-    """
-    if cls.init_descriptors is not None:
-        cls._init_descriptors_ = cls.init_descriptors  # pylint: disable=W0212
-    if cls.use_repr is not None:
-        cls._use_repr_ = cls.use_repr  # pylint: disable=W0212
-    if cls.init_subclass_basecls is not None:
-        cls._init_subclass_basecls_ = cls.init_subclass_basecls  # pylint: disable=W0212
-
-
-class Meta(type):
-    """Metaclass to 'update_attribute_names'."""
-
-    def __new__(cls, *args, **kwargs):
-        meta_cls = super().__new__(cls, *args, **kwargs)
-        update_attribute_names(meta_cls)
-        return meta_cls
-
-
-class ZnInit(metaclass=Meta):
+class ZnInit:
     """Parent class for automatic __init__ generation based on descriptors.
 
     Attributes
@@ -155,13 +131,21 @@ class ZnInit(metaclass=Meta):
         __init__ of the basecls will be called via super.
     """
 
-    _init_descriptors_: typing.List[Descriptor] = [Descriptor]
-    _use_repr_: bool = True
-    _init_subclass_basecls_ = None
-
-    init_descriptors: typing.List[Descriptor] = None
-    use_repr: bool = None
+    init_descriptors: typing.List[Descriptor] = [Descriptor]
+    use_repr: bool = True
     init_subclass_basecls = None
+
+    @property
+    def _init_descriptors_(self) -> typing.List[Descriptor]:
+        return self.init_descriptors
+
+    @property
+    def _use_repr_(self) -> bool:
+        return self.use_repr
+
+    @property
+    def _init_subclass_basecls_(self) -> typing.Type:
+        return self.init_subclass_basecls
 
     def __init__(self):
         """Required for Error messages.
@@ -175,14 +159,15 @@ class ZnInit(metaclass=Meta):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        update_attribute_names(cls)
-        if cls._init_subclass_basecls_ is None:
-            cls._init_subclass_basecls_ = ZnInit
+        _init_subclass_basecls_ = object.__new__(cls)._init_subclass_basecls_
+
+        if _init_subclass_basecls_ is None:
+            _init_subclass_basecls_ = ZnInit
         for inherited in cls.__mro__:
             # Go through the mro until you find the init_subclass_basecls.
             # If found an init before that class it will implement super
             # if not add the fields to the __init__ automatically.
-            if inherited == cls._init_subclass_basecls_:
+            if inherited == _init_subclass_basecls_:
                 break
 
             if inherited.__dict__.get("__init__") is not None:
@@ -190,15 +175,13 @@ class ZnInit(metaclass=Meta):
                     return cls
 
         log.debug(
-            f"Found {cls._init_subclass_basecls_} instance - adding dataclass-like"
-            " __init__"
+            f"Found {_init_subclass_basecls_} instance - adding dataclass-like __init__"
         )
-        return cls._update_init(super_init=cls._init_subclass_basecls_.__init__)
+        return cls._update_init(super_init=_init_subclass_basecls_.__init__)
 
     @classmethod
     def _get_descriptors(cls):
-        update_attribute_names(cls)
-        return get_descriptors(descriptor=cls._init_descriptors_, cls=cls)
+        return get_descriptors(descriptor=object.__new__(cls)._init_descriptors_, cls=cls)
 
     @classmethod
     def _update_init(cls, super_init):
