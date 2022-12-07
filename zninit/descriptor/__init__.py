@@ -188,6 +188,8 @@ def get_descriptors(
         a list of the found descriptor objects
 
     """
+    if descriptor is None:
+        return []
     if self is None and cls is None:
         raise ValueError("Either self or cls must not be None")
     if self is not None and cls is not None:

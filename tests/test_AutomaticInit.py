@@ -65,6 +65,15 @@ class ChildCls(ParentCls):
 class OnlyParamsInInit(ZnInit):
     """ZnInit child."""
 
+    _init_descriptors_ = [Params]
+
+    parameter: int = Params()
+    output = Outs()
+
+
+class OnlyParamsInInitOld(ZnInit):
+    """ZnInit child."""
+
     init_descriptors = [Params]
 
     parameter: int = Params()
@@ -180,9 +189,13 @@ def test_DefaultIsNone():
     assert instance.parameter == 42
 
 
-def test_OnlyParamsInInit():
+@pytest.mark.parametrize("cls", (OnlyParamsInInit, OnlyParamsInInitOld))
+def test_OnlyParamsInInit(cls):
     """ZnInit Test."""
-    instance = OnlyParamsInInit(parameter=10)
+    instance = cls(parameter=10)
     assert instance.parameter == 10
     with pytest.raises(AttributeError):
         _ = instance.output
+
+    with pytest.raises(TypeError):
+        cls(parameter=10, output=25)
