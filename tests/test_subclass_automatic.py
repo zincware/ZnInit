@@ -17,13 +17,21 @@ class Parent(ZnInit):
 class Child(Parent):
     """Child class."""
 
+    _init_subclass_basecls_ = Parent
+    text = Descriptor()
+
+
+class ChildOld(Parent):
+    """Child class."""
+
     init_subclass_basecls = Parent
     text = Descriptor()
 
 
-def test_subclass_init():
+@pytest.mark.parametrize("cls", (Child, ChildOld))
+def test_subclass_init(cls):
     """Test subclass init."""
-    instance = Child(name="Test", text="Hello World")
+    instance = cls(name="Test", text="Hello World")
     assert instance.name == "Test"
     assert instance.text == "Hello World"
 
@@ -31,11 +39,11 @@ def test_subclass_init():
     assert instance.name == "Test"
 
     with pytest.raises(TypeError):
-        _ = Child(name="Test", text="Hello World", data="Lorem Ipsum")
+        _ = cls(name="Test", text="Hello World", data="Lorem Ipsum")
 
     with pytest.raises(TypeError):
-        _ = Child(name="Test")
+        _ = cls(name="Test")
 
-    instance = Child(text="Hello World")
+    instance = cls(text="Hello World")
     assert instance.name is None
     assert instance.text == "Hello World"

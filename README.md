@@ -49,7 +49,7 @@ class Metric(Descriptor):
 
 
 class Human(ZnInit):
-    init_descriptors = [Input] # only add Input descriptors to the __init__
+    _init_descriptors_ = [Input] # only add Input descriptors to the __init__
     name: str = Input()
     language: str = Input("DE")
     date: str = Metric()  # will not appear in the __init__

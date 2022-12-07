@@ -88,7 +88,7 @@ def get_auto_init(
             raise get_args_type_error(args, cls_name, uses_auto_init)
         log.debug(f"The '__init__' uses auto_init: {uses_auto_init}")
         for kwarg_name in kwargs_no_default:
-            try:  # pylint: disable=loop-try-except-usage
+            try:  # pylint: disable=R8203
                 init_kwargs[kwarg_name] = kwargs.pop(kwarg_name)
             except KeyError:
                 required_keys.append(kwarg_name)
@@ -114,25 +114,53 @@ def get_auto_init(
     return auto_init
 
 
-class ZnInit:
+def update_attribute_names(cls):
+    """Update changed attribute names.
+
+    E.g. 'init_descriptors' was renamed to '_init_descriptors_' but should be
+    backwards compatible. This was done according to PEP8 style guide where
+     '_single_leading_underscore' are meant for weak internal usage.
+    """
+    if cls.init_descriptors is not None:
+        cls._init_descriptors_ = cls.init_descriptors  # pylint: disable=W0212
+    if cls.use_repr is not None:
+        cls._use_repr_ = cls.use_repr  # pylint: disable=W0212
+    if cls.init_subclass_basecls is not None:
+        cls._init_subclass_basecls_ = cls.init_subclass_basecls  # pylint: disable=W0212
+
+
+class Meta(type):
+    """Metaclass to 'update_attribute_names'."""
+
+    def __new__(cls, *args, **kwargs):
+        meta_cls = super().__new__(cls, *args, **kwargs)
+        update_attribute_names(meta_cls)
+        return meta_cls
+
+
+class ZnInit(metaclass=Meta):
     """Parent class for automatic __init__ generation based on descriptors.
 
     Attributes
     ----------
-    init_descriptors: list
+    _init_descriptors_: list
         A list of the descriptor classes to be added to the init.
         This also supports subclasses of Descriptor.
-    use_repr: bool
+    _use_repr_: bool
         Generate an automatic, dataclass like representation string.
-    init_subclass_basecls: object
+    _init_subclass_basecls_: object
         Any class (not an instance) that acts as the lower bound for searching an
         __init__ method. If the __init__ of this class is reached when iterating
         over the mro, an automatic __init__ method will be generated and the
         __init__ of the basecls will be called via super.
     """
 
-    init_descriptors: typing.List[Descriptor] = [Descriptor]
-    use_repr: bool = True
+    _init_descriptors_: typing.List[Descriptor] = [Descriptor]
+    _use_repr_: bool = True
+    _init_subclass_basecls_ = None
+
+    init_descriptors: typing.List[Descriptor] = None
+    use_repr: bool = None
     init_subclass_basecls = None
 
     def __init__(self):
@@ -147,13 +175,14 @@ class ZnInit:
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        if cls.init_subclass_basecls is None:
-            cls.init_subclass_basecls = ZnInit
+        update_attribute_names(cls)
+        if cls._init_subclass_basecls_ is None:
+            cls._init_subclass_basecls_ = ZnInit
         for inherited in cls.__mro__:
             # Go through the mro until you find the init_subclass_basecls.
             # If found an init before that class it will implement super
             # if not add the fields to the __init__ automatically.
-            if inherited == cls.init_subclass_basecls:
+            if inherited == cls._init_subclass_basecls_:
                 break
 
             if inherited.__dict__.get("__init__") is not None:
@@ -161,13 +190,15 @@ class ZnInit:
                     return cls
 
         log.debug(
-            f"Found {cls.init_subclass_basecls} instance - adding dataclass-like __init__"
+            f"Found {cls._init_subclass_basecls_} instance - adding dataclass-like"
+            " __init__"
         )
-        return cls._update_init(super_init=cls.init_subclass_basecls.__init__)
+        return cls._update_init(super_init=cls._init_subclass_basecls_.__init__)
 
     @classmethod
     def _get_descriptors(cls):
-        return get_descriptors(descriptor=cls.init_descriptors, cls=cls)
+        update_attribute_names(cls)
+        return get_descriptors(descriptor=cls._init_descriptors_, cls=cls)
 
     @classmethod
     def _update_init(cls, super_init):
@@ -250,7 +281,7 @@ class ZnInit:
 
     def __repr__(self):
         """Get a dataclass like representation of the ZnInit class."""
-        if not self.use_repr:
+        if not self._use_repr_:
             return super().__repr__()
         repr_str = f"{self.__class__.__name__}("
         fields = []
