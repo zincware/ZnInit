@@ -88,7 +88,7 @@ def get_auto_init(
             raise get_args_type_error(args, cls_name, uses_auto_init)
         log.debug(f"The '__init__' uses auto_init: {uses_auto_init}")
         for kwarg_name in kwargs_no_default:
-            try:  # pylint: disable=loop-try-except-usage
+            try:
                 init_kwargs[kwarg_name] = kwargs.pop(kwarg_name)
             except KeyError:
                 required_keys.append(kwarg_name)
@@ -122,20 +122,20 @@ def update_attribute_names(cls):
      '_single_leading_underscore' are meant for weak internal usage.
     """
     if cls.init_descriptors is not None:
-        cls._init_descriptors_ = cls.init_descriptors
+        cls._init_descriptors_ = cls.init_descriptors # pylint: disable=W0212
     if cls.use_repr is not None:
-        cls._use_repr_ = cls.use_repr
+        cls._use_repr_ = cls.use_repr  #pylint: disable=W0212
     if cls.init_subclass_basecls is not None:
-        cls._init_subclass_basecls_ = cls.init_subclass_basecls
+        cls._init_subclass_basecls_ = cls.init_subclass_basecls  #pylint: disable=W0212
 
 
 class Meta(type):
     """Metaclass to 'update_attribute_names'."""
 
     def __new__(cls, *args, **kwargs):
-        x = super().__new__(cls, *args, **kwargs)
-        update_attribute_names(x)
-        return x
+        meta_cls = super().__new__(cls, *args, **kwargs)
+        update_attribute_names(meta_cls)
+        return meta_cls
 
 
 class ZnInit(metaclass=Meta):
