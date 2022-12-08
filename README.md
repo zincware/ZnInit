@@ -54,7 +54,7 @@ class Human(ZnInit):
     language: str = Input("DE")
     date: str = Metric()  # will not appear in the __init__
 
-    def post_init(self):
+    def _post_init_(self):
         self.date = "2022-09-16"
 
 

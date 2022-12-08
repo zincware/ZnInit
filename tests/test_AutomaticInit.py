@@ -1,6 +1,7 @@
 """Test for the automatic __init__."""
 import pytest
 
+import zninit
 from zninit import Descriptor, ZnInit
 
 # autocomplete issue https://youtrack.jetbrains.com/issue/PY-38072
@@ -199,3 +200,42 @@ def test_OnlyParamsInInit(cls):
 
     with pytest.raises(TypeError):
         cls(parameter=10, output=25)
+
+
+class PostInitA(zninit.ZnInit):
+    """Class with 'post_init'."""
+
+    parameter = zninit.Descriptor()
+    called = False
+
+    def post_init(self):
+        """Post init call."""
+        self.called = True
+
+
+class PostInitB(zninit.ZnInit):
+    """Class with '_post_init_'."""
+
+    parameter = zninit.Descriptor()
+    called = False
+
+    def _post_init_(self):
+        """Post init call."""
+        self.called = True
+
+
+class PostInitC(zninit.ZnInit):
+    """Class with '__post_init__'."""
+
+    parameter = zninit.Descriptor()
+    called = False
+
+    def __post_init__(self):
+        """Post init call."""
+        self.called = True
+
+
+@pytest.mark.parametrize("cls", (PostInitA, PostInitB, PostInitC))
+def test_post_init_called(cls):
+    """Test different versions of '_post_init_'."""
+    assert cls(parameter="Test").called
