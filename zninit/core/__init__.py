@@ -1,7 +1,6 @@
 """Functionality to generate the automatic __init__."""
 from __future__ import annotations
 
-import contextlib
 import logging
 import typing
 from copy import deepcopy
@@ -105,8 +104,9 @@ def get_auto_init(
         for key, value in init_kwargs.items():
             setattr(self, key, value)
 
-        with contextlib.suppress(AttributeError):
-            self.post_init()
+        for post_init in ["__post_init__", "_post_init_", "post_init"]:
+            if hasattr(self, post_init):
+                getattr(self, post_init)()
 
     # we add this attribute to the __init__ to make it identifiable
     auto_init.uses_auto_init = True
@@ -114,7 +114,7 @@ def get_auto_init(
     return auto_init
 
 
-class ZnInit:
+class ZnInit:  # pylint: disable=R0903
     """Parent class for automatic __init__ generation based on descriptors.
 
     Attributes
@@ -276,10 +276,9 @@ class ZnInit:
         repr_str += ")"
         return repr_str
 
-    def post_init(self):
+    def _post_init_(self):
         """Implement if cmds after the automatically generated __init__ should be run.
 
         This only works if no __init__ is defined and the automatically generated
         __init__ is used.
         """
-        raise AttributeError(f"'{self}' object has no attribute 'post_init'")
