@@ -170,7 +170,7 @@ class Descriptor:  # pylint: disable=too-many-instance-attributes
         if self._frozen.get(instance, False):
             raise TypeError(f"Frozen attribute '{self.name}' can not be changed.")
         if self.on_setattr is not None:
-            value = self.on_setattr(instance, value)
+            value = self.on_setattr(value)
         if self.check_types:
             typeguard.check_type(
                 argname=self.name, value=value, expected_type=self.annotation
