@@ -184,8 +184,8 @@ def test_descriptor_metadata():
 class WithSetAttr:
     """Modify the value before saving it."""
 
-    value = Descriptor(on_setattr=lambda self, value: value + 1)
-    value_frozen = Descriptor(frozen=True, on_setattr=lambda self, value: value + 1)
+    value = Descriptor(on_setattr=lambda value: value + 1)
+    value_frozen = Descriptor(frozen=True, on_setattr=lambda value: value + 1)
 
 
 def test_with_setattr():
