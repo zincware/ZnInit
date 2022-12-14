@@ -180,10 +180,6 @@ class ZnInit:  # pylint: disable=R0903
         return cls._update_init(super_init=_init_subclass_basecls_.__init__)
 
     @classmethod
-    def _get_descriptors(cls):
-        return get_descriptors(descriptor=object.__new__(cls)._init_descriptors_, cls=cls)
-
-    @classmethod
     def _update_init(cls, super_init):
         """Set the automatic __init__.
 
@@ -224,7 +220,9 @@ class ZnInit:  # pylint: disable=R0903
         kwargs_no_default = []
         kwargs_with_default = {}
 
-        for descriptor in cls._get_descriptors():
+        for descriptor in get_descriptors(
+            descriptor=object.__new__(cls)._init_descriptors_, cls=cls
+        ):
             # For the new __init__
             if descriptor.default is Empty:
                 kwargs_no_default.append(descriptor.name)
@@ -250,7 +248,9 @@ class ZnInit:  # pylint: disable=R0903
         signature_params = []
         cls_annotations = cls.__annotations__  # pylint: disable=no-member
         # fix for https://bugs.python.org/issue46930
-        for descriptor in cls._get_descriptors():
+        for descriptor in get_descriptors(
+            descriptor=object.__new__(cls)._init_descriptors_, cls=cls
+        ):
             # For the new __signature__
             signature_params.append(
                 Parameter(
@@ -268,7 +268,7 @@ class ZnInit:  # pylint: disable=R0903
             return super().__repr__()
         repr_str = f"{self.__class__.__name__}("
         fields = []
-        for descriptor in self._get_descriptors():
+        for descriptor in get_descriptors(descriptor=self._init_descriptors_, self=self):
             if descriptor.use_repr:
                 representation = descriptor.get_repr(getattr(self, descriptor.name))
             else:
