@@ -53,6 +53,7 @@ class Descriptor:  # pylint: disable=too-many-instance-attributes
         instance=None,
         name="",
         use_repr: bool = True,
+        repr_func: typing.Callable = repr,
         check_types: bool = False,
         metadata: dict = None,
         frozen: bool = False,
@@ -78,6 +79,8 @@ class Descriptor:  # pylint: disable=too-many-instance-attributes
             Freeze the attribute after the first __set__ call.
         metadata: dict, default=None
             additional metadata for the descriptor.
+        repr_func: Callable, default=repr
+            A callable that will be used to compute the _repr_ of the descriptor.
         """
         self._default = default
         self._owner = owner
@@ -87,6 +90,7 @@ class Descriptor:  # pylint: disable=too-many-instance-attributes
         self.check_types = check_types
         self.metadata = metadata or {}
         self.frozen = frozen
+        self.get_repr = repr_func
         self._frozen = weakref.WeakKeyDictionary()
         if check_types and ("typeguard" not in sys.modules):
             raise ImportError(
