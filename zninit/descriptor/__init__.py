@@ -5,6 +5,7 @@ import contextlib
 import functools
 import sys
 import typing
+import weakref
 
 with contextlib.suppress(ImportError):
     import typeguard
@@ -18,7 +19,7 @@ class Empty:  # pylint: disable=too-few-public-methods
     """
 
 
-class Descriptor:
+class Descriptor:  # pylint: disable=too-many-instance-attributes
     """Simple Python Descriptor that allows adding.
 
     This class allows to add metadata to arbitrary class arguments:
@@ -53,6 +54,8 @@ class Descriptor:
         name="",
         use_repr: bool = True,
         check_types: bool = False,
+        metadata: dict = None,
+        frozen: bool = False,
     ):  # pylint: disable=too-many-arguments
         """Define a Descriptor object.
 
@@ -71,6 +74,10 @@ class Descriptor:
             descriptor should be used in the __repr__ string.
         check_types: bool, default=False
             Check the type when using __set__ against the type annotation.
+        frozen: bool, default=False
+            Freeze the attribute after the first __set__ call.
+        metadata: dict, default=None
+            additional metadata for the descriptor.
         """
         self._default = default
         self._owner = owner
@@ -78,6 +85,9 @@ class Descriptor:
         self._name = name
         self.use_repr = use_repr
         self.check_types = check_types
+        self.metadata = metadata or {}
+        self.frozen = frozen
+        self._frozen = weakref.WeakKeyDictionary()
         if check_types and ("typeguard" not in sys.modules):
             raise ImportError(
                 "Need to install 'pip install zninit[typeguard]' for type checking."
@@ -117,12 +127,11 @@ class Descriptor:
         except AttributeError:
             annotations = {}
 
-        if self.check_types:
-            if self.name not in annotations:
-                raise KeyError(
-                    f"Could not find 'annotation' for {self.name} in '{self.owner}' with"
-                    " 'check_types=True'"
-                )
+        if self.check_types and self.name not in annotations:
+            raise KeyError(
+                f"Could not find 'annotation' for {self.name} in '{self.owner}' with"
+                " 'check_types=True'"
+            )
         return annotations.get(self.name)
 
     def __set_name__(self, owner, name):
@@ -149,12 +158,16 @@ class Descriptor:
 
     def __set__(self, instance, value):
         """Save value to instance.__dict__."""
+        if self._frozen.get(instance, False):
+            raise TypeError(f"Frozen attribute '{self.name}' can not be changed.")
         if self.check_types:
             typeguard.check_type(
                 argname=self.name, value=value, expected_type=self.annotation
             )
         self._instance = instance
         instance.__dict__[self.name] = value
+        if self.frozen:
+            self._frozen[instance] = True
 
 
 DescriptorTypeT = typing.TypeVar("DescriptorTypeT", bound=Descriptor)
