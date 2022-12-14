@@ -1,6 +1,6 @@
 """'ZnInit' unit tests."""
 from zninit import Descriptor, ZnInit
-from zninit.core import get_args_type_error, get_init_type_error
+from zninit.core import _get_auto_init_kwargs, get_args_type_error, get_init_type_error
 
 
 class ClsDefaultMixed(ZnInit):
@@ -22,7 +22,7 @@ class DoNotUseRepr(ZnInit):
 
 def test_get_auto_init_kwargs():
     """Test auto init kwargs."""
-    kwargs_no_default, kwargs_with_default = ClsDefaultMixed._get_auto_init_kwargs()
+    kwargs_no_default, kwargs_with_default = _get_auto_init_kwargs(ClsDefaultMixed)
     assert kwargs_no_default == ["param1"]
     assert kwargs_with_default == {"param2": "World"}
 

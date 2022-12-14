@@ -114,6 +114,91 @@ def get_auto_init(
     return auto_init
 
 
+def _update_init(cls, super_init):
+    """Set the automatic __init__.
+
+    Parameters
+    ----------
+    cls:
+        the cls to be updated
+    super_init:
+        run a super call if required
+
+    Returns
+    -------
+    the updated cls instance
+
+    """
+    kwargs_no_default, kwargs_with_default = _get_auto_init_kwargs(cls)
+    signature_params = _get_auto_init_signature(cls)
+
+    # Add new __init__ to the subclass
+    setattr(
+        cls,
+        "__init__",
+        get_auto_init(kwargs_no_default, kwargs_with_default, super_init=super_init),
+    )
+
+    # Add new __signature__ to the subclass
+    signature = Signature(parameters=signature_params)
+    setattr(cls, "__signature__", signature)
+
+    return cls
+
+
+def _get_auto_init_kwargs(cls) -> (list, dict):
+    """Get the keywords for the __init__.
+
+    Collect keywords with and without default values for the init
+    """
+    kwargs_no_default = []
+    kwargs_with_default = {}
+
+    for descriptor in get_descriptors(
+        descriptor=object.__new__(cls)._init_descriptors_,  # pylint: disable=W0212
+        cls=cls,
+    ):
+        # For the new __init__
+        if descriptor.default is Empty:
+            kwargs_no_default.append(descriptor.name)
+        else:
+            kwargs_with_default[descriptor.name] = deepcopy(descriptor.default)
+
+    return kwargs_no_default, kwargs_with_default
+
+
+def _get_auto_init_signature(cls) -> (list, dict, list):
+    """Iterate over ZnTrackOptions in the __dict__ and save the option name.
+
+    and create a signature Parameter
+
+    Returns
+    -------
+        kwargs_no_default: list
+            a list of names that will be converted to kwargs
+        kwargs_with_default: dict
+            a dict of {name: default} that will be converted to kwargs
+        signature_params: inspect.Parameter
+    """
+    signature_params = []
+    cls_annotations = cls.__annotations__  # pylint: disable=no-member
+    # fix for https://bugs.python.org/issue46930
+    for descriptor in get_descriptors(
+        descriptor=object.__new__(cls)._init_descriptors_,  # pylint: disable=W0212
+        cls=cls,
+    ):
+        # For the new __signature__
+        signature_params.append(
+            Parameter(
+                # default=...
+                name=descriptor.name,
+                kind=Parameter.POSITIONAL_OR_KEYWORD,
+                annotation=cls_annotations.get(descriptor.name),
+            )
+        )
+    return signature_params
+
+
 class ZnInit:  # pylint: disable=R0903
     """Parent class for automatic __init__ generation based on descriptors.
 
@@ -177,90 +262,7 @@ class ZnInit:  # pylint: disable=R0903
         log.debug(
             f"Found {_init_subclass_basecls_} instance - adding dataclass-like __init__"
         )
-        return cls._update_init(super_init=_init_subclass_basecls_.__init__)
-
-    @classmethod
-    def _update_init(cls, super_init):
-        """Set the automatic __init__.
-
-        Parameters
-        ----------
-        cls:
-            the cls to be updated
-        super_init:
-            run a super call if required
-
-        Returns
-        -------
-        the updated cls instance
-
-        """
-        kwargs_no_default, kwargs_with_default = cls._get_auto_init_kwargs()
-        signature_params = cls._get_auto_init_signature()
-
-        # Add new __init__ to the subclass
-        setattr(
-            cls,
-            "__init__",
-            get_auto_init(kwargs_no_default, kwargs_with_default, super_init=super_init),
-        )
-
-        # Add new __signature__ to the subclass
-        signature = Signature(parameters=signature_params)
-        setattr(cls, "__signature__", signature)
-
-        return cls
-
-    @classmethod
-    def _get_auto_init_kwargs(cls) -> (list, dict):
-        """Get the keywords for the __init__.
-
-        Collect keywords with and without default values for the init
-        """
-        kwargs_no_default = []
-        kwargs_with_default = {}
-
-        for descriptor in get_descriptors(
-            descriptor=object.__new__(cls)._init_descriptors_, cls=cls
-        ):
-            # For the new __init__
-            if descriptor.default is Empty:
-                kwargs_no_default.append(descriptor.name)
-            else:
-                kwargs_with_default[descriptor.name] = deepcopy(descriptor.default)
-
-        return kwargs_no_default, kwargs_with_default
-
-    @classmethod
-    def _get_auto_init_signature(cls) -> (list, dict, list):
-        """Iterate over ZnTrackOptions in the __dict__ and save the option name.
-
-        and create a signature Parameter
-
-        Returns
-        -------
-            kwargs_no_default: list
-                a list of names that will be converted to kwargs
-            kwargs_with_default: dict
-                a dict of {name: default} that will be converted to kwargs
-            signature_params: inspect.Parameter
-        """
-        signature_params = []
-        cls_annotations = cls.__annotations__  # pylint: disable=no-member
-        # fix for https://bugs.python.org/issue46930
-        for descriptor in get_descriptors(
-            descriptor=object.__new__(cls)._init_descriptors_, cls=cls
-        ):
-            # For the new __signature__
-            signature_params.append(
-                Parameter(
-                    # default=...
-                    name=descriptor.name,
-                    kind=Parameter.POSITIONAL_OR_KEYWORD,
-                    annotation=cls_annotations.get(descriptor.name),
-                )
-            )
-        return signature_params
+        return _update_init(cls=cls, super_init=_init_subclass_basecls_.__init__)
 
     def __repr__(self):
         """Get a dataclass like representation of the ZnInit class."""
