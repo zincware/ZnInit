@@ -1,6 +1,6 @@
 """'ZnInit' unit tests."""
 from zninit import Descriptor, ZnInit
-from zninit.core import get_args_type_error, get_init_type_error
+from zninit.core import _get_auto_init_kwargs, get_args_type_error, get_init_type_error
 
 
 class ClsDefaultMixed(ZnInit):
@@ -22,7 +22,7 @@ class DoNotUseRepr(ZnInit):
 
 def test_get_auto_init_kwargs():
     """Test auto init kwargs."""
-    kwargs_no_default, kwargs_with_default = ClsDefaultMixed._get_auto_init_kwargs()
+    kwargs_no_default, kwargs_with_default = _get_auto_init_kwargs(ClsDefaultMixed)
     assert kwargs_no_default == ["param1"]
     assert kwargs_with_default == {"param2": "World"}
 
@@ -96,4 +96,25 @@ def test_repr():
     DoNotUseRepr.use_repr = False
     assert repr(DoNotUseRepr(param1="Hello", param2="World")).startswith(
         "<test_u_core.DoNotUseRepr object at"
+    )
+
+
+class CustomRepr(ZnInit):
+    """Class with disabled repr."""
+
+    param1 = Descriptor(repr_func=lambda x: rf"'Custom: {x}'")
+    method = Descriptor(repr_func=lambda x: f"<function {x.__module__}.{x.__name__}>")
+
+
+def test_custom_repr():
+    """Test the __repr__."""
+
+    def do_something():
+        pass
+
+    instance = CustomRepr(param1="Hello", method=do_something)
+    assert (
+        repr(instance)
+        == "CustomRepr(method=<function test_u_core.do_something>, param1='Custom:"
+        " Hello')"
     )
