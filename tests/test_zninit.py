@@ -5,4 +5,4 @@ import zninit
 
 def test_version():
     """Test the installed version."""
-    assert zninit.__version__ == "0.1.6"
+    assert zninit.__version__ == "0.1.7"

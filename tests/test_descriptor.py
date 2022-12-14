@@ -146,3 +146,36 @@ def test_get_desc_values():
 
     assert desc1_1.__get__(self) == "Hello"
     assert desc1_2.__get__(self) == "World"
+
+
+class FrozenExample:
+    """ZnInit Frozen Descriptor."""
+
+    value = Descriptor(frozen=True)
+
+
+def test_frozen_descriptor():
+    """Test a frozen descriptor."""
+    example = FrozenExample()
+    example.value = 42
+    with pytest.raises(TypeError):
+        example.value = 25
+    assert example.value == 42
+
+    # Running twice is a test.
+    example = FrozenExample()
+    example.value = 42
+    with pytest.raises(TypeError):
+        example.value = 25
+    assert example.value == 42
+
+
+class WithMetadata:
+    """ZnInit Descriptor with metadata."""
+
+    value = Descriptor(metadata={"foo": "bar"})
+
+
+def test_descriptor_metadata():
+    """Test a descriptor with metadata."""
+    assert WithMetadata.value.metadata["foo"] == "bar"
