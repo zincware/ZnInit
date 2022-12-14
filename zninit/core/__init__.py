@@ -271,10 +271,9 @@ class ZnInit:  # pylint: disable=R0903
         repr_str = f"{self.__class__.__name__}("
         fields = []
         for descriptor in get_descriptors(descriptor=self._init_descriptors_, self=self):
-            if descriptor.use_repr:
-                representation = descriptor.get_repr(getattr(self, descriptor.name))
-            else:
+            if not descriptor.use_repr:
                 continue
+            representation = descriptor.get_repr(getattr(self, descriptor.name))
 
             fields.append(f"{descriptor.name}={representation}")
         repr_str += ", ".join(fields)
