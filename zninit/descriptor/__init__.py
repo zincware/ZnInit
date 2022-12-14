@@ -57,6 +57,7 @@ class Descriptor:  # pylint: disable=too-many-instance-attributes
         check_types: bool = False,
         metadata: dict = None,
         frozen: bool = False,
+        on_setattr: typing.Callable = None,
     ):  # pylint: disable=too-many-arguments
         """Define a Descriptor object.
 
@@ -81,6 +82,9 @@ class Descriptor:  # pylint: disable=too-many-instance-attributes
             additional metadata for the descriptor.
         repr_func: Callable, default=repr
             A callable that will be used to compute the _repr_ of the descriptor.
+        on_setattr: Callable, default=None
+            A callable that is run whenever an attribute is set via 'class.myattr = value'
+             or 'setattr(class, "mattr", value)'.
         """
         self._default = default
         self._owner = owner
@@ -91,6 +95,7 @@ class Descriptor:  # pylint: disable=too-many-instance-attributes
         self.metadata = metadata or {}
         self.frozen = frozen
         self.get_repr = repr_func
+        self.on_setattr = on_setattr
         self._frozen = weakref.WeakKeyDictionary()
         if check_types and ("typeguard" not in sys.modules):
             raise ImportError(
@@ -164,6 +169,8 @@ class Descriptor:  # pylint: disable=too-many-instance-attributes
         """Save value to instance.__dict__."""
         if self._frozen.get(instance, False):
             raise TypeError(f"Frozen attribute '{self.name}' can not be changed.")
+        if self.on_setattr is not None:
+            value = self.on_setattr(instance, value)
         if self.check_types:
             typeguard.check_type(
                 argname=self.name, value=value, expected_type=self.annotation

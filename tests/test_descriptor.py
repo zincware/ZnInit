@@ -179,3 +179,23 @@ class WithMetadata:
 def test_descriptor_metadata():
     """Test a descriptor with metadata."""
     assert WithMetadata.value.metadata["foo"] == "bar"
+
+
+class WithSetAttr:
+    """Modify the value before saving it."""
+
+    value = Descriptor(on_setattr=lambda self, value: value + 1)
+    value_frozen = Descriptor(frozen=True, on_setattr=lambda self, value: value + 1)
+
+
+def test_with_setattr():
+    """Test a descriptor with on_setattr."""
+    example = WithSetAttr()
+    example.value = 1
+    assert example.value == 2
+
+    example.value_frozen = 1
+    assert example.value_frozen == 2
+
+    with pytest.raises(TypeError):
+        example.value_frozen = 10
