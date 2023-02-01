@@ -3,6 +3,7 @@
 [![PyPI version](https://badge.fury.io/py/zninit.svg)](https://badge.fury.io/py/zninit)
 [![code-style](https://img.shields.io/badge/code%20style-black-black)](https://github.com/psf/black/)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/zincware/ZnInit/HEAD)
+[![zincware](https://img.shields.io/badge/Powered%20by-zincware-darkcyan)](https://github.com/zincware)
 
 # ZnInit - Automatic Generation of ``__init__`` based on Descriptors
 
