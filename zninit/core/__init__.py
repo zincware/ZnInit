@@ -78,7 +78,7 @@ def get_auto_init(
     kwargs_with_default = {} if kwargs_with_default is None else kwargs_with_default
 
     def auto_init(self, *args, **kwargs):
-        """Wrapper for the __init__."""
+        """Wrap the __init__ method to generate automatic keyword arguments."""
         init_kwargs = {}
         required_keys = []
         uses_auto_init = getattr(self.__init__, "uses_auto_init", False)
@@ -233,7 +233,7 @@ class ZnInit:  # pylint: disable=R0903
         return self.init_subclass_basecls
 
     def __init__(self):
-        """Required for Error messages.
+        """Define the __init__ because it is required for error messages.
 
         Otherwise, it would just raise 'object.__init__() takes exactly one argument'
 
@@ -243,6 +243,7 @@ class ZnInit:  # pylint: disable=R0903
         """
 
     def __init_subclass__(cls, **kwargs):
+        """Magic method which is called upon class inheritance."""
         super().__init_subclass__(**kwargs)
         _init_subclass_basecls_ = object.__new__(cls)._init_subclass_basecls_
 

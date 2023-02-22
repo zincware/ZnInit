@@ -20,7 +20,7 @@ coverage = "^6.4.4"
 pylint = "^2.15.2"
 perflint = "^0.7.3"
 pre-commit = "^2.20.0"
-ruff = "^0.0.126"
+ruff = "^0.0.251"
 
 [tool.poetry.group.notebook.dependencies]
 jupyterlab = "^3.4.7"
