@@ -24,6 +24,10 @@ def test_ExampleCls():
     example = ExampleCls(parameter=25)
     assert example.parameter == 25
     assert ExampleCls[42] == 42
+    assert zninit.Descriptor.get_dict(example) == {
+        "parameter": 25,
+        "frozen_parameter": None,
+    }
 
 
 def test_frozen_parameter():

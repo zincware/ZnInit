@@ -102,6 +102,15 @@ class Descriptor:  # pylint: disable=too-many-instance-attributes
                 "Need to install 'pip install zninit[typeguard]' for type checking."
             )
 
+    @classmethod
+    def get_dict(cls, instance: typing.Any) -> dict:
+        """Get a {attribute-name: value} dict from instance for this descriptor."""
+        descriptors = get_descriptors(cls, self=instance)
+        return {
+            descriptor.name: getattr(instance, descriptor.name)
+            for descriptor in descriptors
+        }
+
     @property
     def name(self):
         """Property for the name attribute to protect changing it."""
@@ -132,16 +141,16 @@ class Descriptor:  # pylint: disable=too-many-instance-attributes
             if type checking and the descriptor has no annotation.
         """
         try:
-            annotations = self.owner.__annotations__
+            annotations_ = self.owner.__annotations__
         except AttributeError:
-            annotations = {}
+            annotations_ = {}
 
-        if self.check_types and self.name not in annotations:
+        if self.check_types and self.name not in annotations_:
             raise KeyError(
                 f"Could not find 'annotation' for {self.name} in '{self.owner}' with"
                 " 'check_types=True'"
             )
-        return annotations.get(self.name)
+        return annotations_.get(self.name)
 
     def __set_name__(self, owner, name):
         """Store name of the descriptor in the parent class."""

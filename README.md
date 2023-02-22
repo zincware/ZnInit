@@ -62,6 +62,7 @@ class Human(ZnInit):
 julian = Human(name="Julian")
 print(julian) # Human(language='DE', name='Julian')
 print(julian.date)  # 2022-09-16
+print(Input.get_dict(julian)) # {"name": "Julian", "language": "DE"}
 ````
 One benefit of ``ZnInit`` is that it also allows for inheritance.
 
