@@ -135,6 +135,24 @@ def test_get_custom_descriptors():
     assert get_descriptors(CustomDescriptor2, self=self) == [cls.desc2_1, cls.desc2_2]
 
 
+def test_get_dict_custom_descriptors():
+    """Test the get_dict method from descriptors."""
+    instance = MultipleDescriptors()
+    instance.desc1_1 = "1_1"
+    instance.desc1_2 = "1_2"
+    instance.desc2_1 = "2_1"
+    instance.desc2_2 = "2_2"
+
+    assert CustomDescriptor1.get_dict(instance) == {"desc1_1": "1_1", "desc1_2": "1_2"}
+    assert CustomDescriptor2.get_dict(instance) == {"desc2_1": "2_1", "desc2_2": "2_2"}
+    assert Descriptor.get_dict(instance) == {
+        "desc1_1": "1_1",
+        "desc1_2": "1_2",
+        "desc2_1": "2_1",
+        "desc2_2": "2_2",
+    }
+
+
 def test_get_desc_values():
     """ZnInit test."""
     self = MultipleDescriptors()
