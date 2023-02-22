@@ -37,7 +37,7 @@ jobs:
           installer-parallel: true
       - name: Install package
         run: |
-          poetry install --no-interaction --all-extras
+          poetry install --all-extras --without notebook
       - name: Pytest
         run: |
           source .venv/bin/activate
