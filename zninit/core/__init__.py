@@ -274,7 +274,12 @@ class ZnInit:  # pylint: disable=R0903
         for descriptor in get_descriptors(descriptor=self._init_descriptors_, self=self):
             if not descriptor.use_repr:
                 continue
-            representation = descriptor.get_repr(getattr(self, descriptor.name))
+
+            try:
+                representation = descriptor.get_repr(getattr(self, descriptor.name))
+            except AttributeError:
+                # repr should never raise an AttributeError (or any error actually).
+                representation = "<AttributeError>"
 
             fields.append(f"{descriptor.name}={representation}")
         repr_str += ", ".join(fields)

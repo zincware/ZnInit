@@ -54,3 +54,25 @@ def test_frozen_parameter_default():
     assert example.frozen_parameter == 42
     with pytest.raises(TypeError):
         example.frozen_parameter = 43
+
+
+class AttrErrDesc(zninit.Descriptor):
+    """Descriptor that raises AttributeError."""
+
+    def __get__(self, instance, owner):
+        """Raise AttributeError, e.g. unset value."""
+        if instance is None:
+            return self
+        raise AttributeError
+
+
+class AttrErrCls(zninit.ZnInit):
+    """Example 'ZnInit' with metaclass."""
+
+    input = AttrErrDesc()
+
+
+def test_repr_unset():
+    """Test repr of unset parameter."""
+    example = AttrErrCls(input=42)
+    assert repr(example) == "AttrErrCls(input=<AttributeError>)"

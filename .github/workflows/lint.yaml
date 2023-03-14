@@ -2,59 +2,30 @@ name: Check coding style
 
 on:
   push:
+    branches: [ main ]
   pull_request:
 
 jobs:
-  black:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Black Check
-        uses: psf/black@stable
-        with:
-          version: "22.8.0"
-
-  isort:
+  full:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
           python-version: '3.x'
-      - name: Install isort
-        run: |
-          pip install isort==5.10.1
-      - name: run isort
-        run: |
-          isort --check-only --quiet .
-  ruff:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Install Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.10"
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install ruff
-    - name: Run Ruff
-      run: ruff .
-
-  pylint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: abatilo/actions-poetry@v2
         with:
-          python-version: '3.9'
-      - name: Install package
+          poetry-version: 1.4.0
+      - name: Install lint tools
         run: |
-          pip install .
-      - name: Install pylint
-        run: |
-          pip install pylint perflint
-      - name: run pylint
-        run: |
-          pylint zninit --load-plugins=perflint
+          poetry config virtualenvs.create false
+          poetry install --no-root --only=lint
+      - name: black
+        if: always()
+        run: black --check .
+      - name: isort
+        if: always()
+        run: isort --check-only .
+      - name: ruff
+        if: always()
+        run: ruff .
