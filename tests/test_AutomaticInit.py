@@ -261,6 +261,16 @@ def test_allow_args():
     assert instance.b == 2
     assert instance.c == 42
 
+    instance = AllowArgs(1, 2, c=3)
+    assert instance.a == 1
+    assert instance.b == 2
+    assert instance.c == 3
+
+    instance = AllowArgs(a=1, b=2, c=3)
+    assert instance.a == 1
+    assert instance.b == 2
+    assert instance.c == 3
+
     with pytest.raises(TypeError):
         instance = AllowArgs(1)
 
