@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "zninit"
-version = "0.1.9"
+version = "0.1.10"
 description = "Descriptor based dataclass implementation"
 authors = ["zincwarecode <zincwarecode@gmail.com>"]
 license = "Apache-2.0"
