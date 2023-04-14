@@ -58,6 +58,7 @@ def get_auto_init(
     kwargs_no_default: typing.List[str],
     kwargs_with_default: dict,
     super_init: typing.Callable,
+    allow_args: bool,
 ):
     """Automatically create an __init__ based on fields.
 
@@ -73,6 +74,8 @@ def get_auto_init(
          __init__(self, foo=None, bar=10)
     super_init: Callable
         typically this is Node.__init__
+    allow_args: bool
+        allow args in the __init__. Otherwise only kwargs are allowed
     """
     kwargs_no_default = [] if kwargs_no_default is None else kwargs_no_default
     kwargs_with_default = {} if kwargs_with_default is None else kwargs_with_default
@@ -83,7 +86,7 @@ def get_auto_init(
         required_keys = []
         uses_auto_init = getattr(self.__init__, "uses_auto_init", False)
         cls_name = self.__class__.__name__
-        if args:
+        if args and not allow_args:
             raise get_args_type_error(args, cls_name, uses_auto_init)
         log.debug(f"The '__init__' uses auto_init: {uses_auto_init}")
         for kwarg_name in kwargs_no_default:
@@ -114,7 +117,7 @@ def get_auto_init(
     return auto_init
 
 
-def _update_init(cls, super_init):
+def _update_init(cls, super_init, allow_args):
     """Set the automatic __init__.
 
     Parameters
@@ -123,6 +126,9 @@ def _update_init(cls, super_init):
         the cls to be updated
     super_init:
         run a super call if required
+    allow_args:
+        allow args in the __init__.
+        Otherwise only kwargs are allowed
 
     Returns
     -------
@@ -136,7 +142,12 @@ def _update_init(cls, super_init):
     setattr(
         cls,
         "__init__",
-        get_auto_init(kwargs_no_default, kwargs_with_default, super_init=super_init),
+        get_auto_init(
+            kwargs_no_default,
+            kwargs_with_default,
+            super_init=super_init,
+            allow_args=allow_args,
+        ),
     )
 
     # Add new __signature__ to the subclass
@@ -146,7 +157,7 @@ def _update_init(cls, super_init):
     return cls
 
 
-def _get_auto_init_kwargs(cls) -> (list, dict):
+def _get_auto_init_kwargs(cls) -> typing.Tuple[list, dict]:
     """Get the keywords for the __init__.
 
     Collect keywords with and without default values for the init
@@ -167,7 +178,7 @@ def _get_auto_init_kwargs(cls) -> (list, dict):
     return kwargs_no_default, kwargs_with_default
 
 
-def _get_auto_init_signature(cls) -> (list, dict, list):
+def _get_auto_init_signature(cls) -> typing.Tuple[list, dict, list]:
     """Iterate over ZnTrackOptions in the __dict__ and save the option name.
 
     and create a signature Parameter
@@ -242,7 +253,7 @@ class ZnInit:  # pylint: disable=R0903
         TypeError: ZnInit.__init__() got an unexpected keyword argument ...
         """
 
-    def __init_subclass__(cls, **kwargs):
+    def __init_subclass__(cls, allow_args: bool = False, **kwargs):
         """Magic method which is called upon class inheritance."""
         super().__init_subclass__(**kwargs)
         _init_subclass_basecls_ = object.__new__(cls)._init_subclass_basecls_
@@ -263,7 +274,9 @@ class ZnInit:  # pylint: disable=R0903
         log.debug(
             f"Found {_init_subclass_basecls_} instance - adding dataclass-like __init__"
         )
-        return _update_init(cls=cls, super_init=_init_subclass_basecls_.__init__)
+        return _update_init(
+            cls=cls, super_init=_init_subclass_basecls_.__init__, allow_args=allow_args
+        )
 
     def __repr__(self):
         """Get a dataclass like representation of the ZnInit class."""
