@@ -30,7 +30,7 @@ class ParentClsPlain(ZnInit):
     """A parent class without any changes."""
 
 
-class ChildPlainCls(ParentClsPlain):
+class ChildPlainCls(ParentClsPlain, allow_args=False):
     """ZnInit child."""
 
     parameter: int = Params()
@@ -239,3 +239,43 @@ class PostInitC(zninit.ZnInit):
 def test_post_init_called(cls):
     """Test different versions of '_post_init_'."""
     assert cls(parameter="Test").called
+
+
+class AllowArgs(zninit.ZnInit, allow_args=True):
+    """Class with 'allow_args'."""
+
+    a = zninit.Descriptor()
+    b = zninit.Descriptor()
+    c = zninit.Descriptor(default=42)
+
+
+def test_allow_args():
+    """Allow args test."""
+    instance = AllowArgs(1, 2, 3)
+    assert instance.a == 1
+    assert instance.b == 2
+    assert instance.c == 3
+
+    instance = AllowArgs(1, 2)
+    assert instance.a == 1
+    assert instance.b == 2
+    assert instance.c == 42
+
+    instance = AllowArgs(1, 2, c=3)
+    assert instance.a == 1
+    assert instance.b == 2
+    assert instance.c == 3
+
+    instance = AllowArgs(a=1, b=2, c=3)
+    assert instance.a == 1
+    assert instance.b == 2
+    assert instance.c == 3
+
+    with pytest.raises(TypeError):
+        instance = AllowArgs(1)
+
+    with pytest.raises(TypeError):
+        instance = AllowArgs(1, 2, 3, 4)
+
+    with pytest.raises(TypeError):
+        instance = AllowArgs(1, 2, a=1)
