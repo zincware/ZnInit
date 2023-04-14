@@ -30,7 +30,7 @@ class ParentClsPlain(ZnInit):
     """A parent class without any changes."""
 
 
-class ChildPlainCls(ParentClsPlain):
+class ChildPlainCls(ParentClsPlain, allow_args=False):
     """ZnInit child."""
 
     parameter: int = Params()

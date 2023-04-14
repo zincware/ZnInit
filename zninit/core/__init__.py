@@ -291,7 +291,7 @@ class ZnInit:  # pylint: disable=R0903
         TypeError: ZnInit.__init__() got an unexpected keyword argument ...
         """
 
-    def __init_subclass__(cls, allow_args: bool = False, **kwargs):
+    def __init_subclass__(cls, allow_args: bool = True, **kwargs):
         """Magic method which is called upon class inheritance."""
         super().__init_subclass__(**kwargs)
         _init_subclass_basecls_ = object.__new__(cls)._init_subclass_basecls_
