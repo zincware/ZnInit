@@ -88,7 +88,7 @@ def _handle_args(args, kwargs, kwarg_names, cls_name):
             kwargs[kwarg_names[idx]] = arg_value
 
 
-def get_auto_init(
+def get_auto_init(  # noqa: C901
     kwargs_no_default: typing.List[str],
     kwargs_with_default: dict,
     super_init: typing.Callable,
@@ -114,7 +114,7 @@ def get_auto_init(
     kwargs_no_default = [] if kwargs_no_default is None else kwargs_no_default
     kwargs_with_default = {} if kwargs_with_default is None else kwargs_with_default
 
-    def auto_init(self, *args, **kwargs):
+    def auto_init(self, *args, **kwargs):  # noqa: C901
         """Wrap the __init__ method to generate automatic keyword arguments."""
         init_kwargs = {}
         required_keys = []
@@ -274,7 +274,8 @@ class ZnInit:  # pylint: disable=R0903
         __init__ of the basecls will be called via super.
     _priority_kwargs_: list[str]
         A list of kwargs that should be prioritized in the __init__.
-        These kwargs will be set in the given order before the other args / kwargs are set.
+        These kwargs will be set in the given order before
+        the other args / kwargs are set.
     """
 
     init_descriptors: typing.List[Descriptor] = [Descriptor]

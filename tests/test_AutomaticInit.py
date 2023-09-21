@@ -95,11 +95,16 @@ class ChildClsInit(ParentCls):
 
 
 class FreezeTimeDescriptor(Descriptor):
+    """A descriptor that freezes the time when it is set."""
+
     def __set__(self, instance, value):
+        """Set the value."""
         return super().__set__(instance, datetime.datetime.now())
 
 
 class PriorityKwargs(ZnInit):
+    """Test class for '_priority_kwargs_'."""
+
     _priority_kwargs_ = ["a", "c", "b"]
 
     a: int = FreezeTimeDescriptor()
@@ -118,7 +123,7 @@ def test_ParentClsPlain():
     """ZnInit Test."""
     _ = ParentClsPlain()
     with pytest.raises(TypeError):
-        _ = ParentClsPlain(paramter=10)
+        _ = ParentClsPlain(parameter=10)
 
 
 def test_ChildPlainCls():

@@ -77,3 +77,6 @@ exclude = [
     "venv",
     "tmp",
 ]
+
+[tool.codespell]
+skip = "poetry.lock"
