@@ -1,9 +1,10 @@
 """Test for the automatic __init__."""
+import datetime
+
 import pytest
 
 import zninit
 from zninit import Descriptor, ZnInit
-import datetime
 
 # autocomplete issue https://youtrack.jetbrains.com/issue/PY-38072
 
@@ -92,9 +93,11 @@ class ChildClsInit(ParentCls):
         )  # super(ChildClsInit, self).__init__ does not work!
         self.value = value
 
+
 class FreezeTimeDescriptor(Descriptor):
     def __set__(self, instance, value):
         return super().__set__(instance, datetime.datetime.now())
+
 
 class PriorityKwargs(ZnInit):
     _priority_kwargs_ = ["a", "c", "b"]
@@ -104,11 +107,11 @@ class PriorityKwargs(ZnInit):
     c: int = FreezeTimeDescriptor()
     d: int = FreezeTimeDescriptor()
 
+
 def test_PriorityKwargs():
     """Test '_priority_kwargs' order works."""
     x = PriorityKwargs(a=1, b=2, c=3, d=4)
     assert x.a < x.c < x.b < x.d
-
 
 
 def test_ParentClsPlain():
