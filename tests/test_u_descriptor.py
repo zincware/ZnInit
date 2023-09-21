@@ -104,6 +104,6 @@ def test_no_typeguard():
     sys.modules.pop("typeguard")
     with pytest.raises(ImportError):
         _ = Descriptor(check_types=True)
-    import typeguard  # noqa=F401
+    import typeguard  # noqa: F401
 
     _ = Descriptor(check_types=True)

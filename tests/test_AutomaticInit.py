@@ -1,4 +1,6 @@
 """Test for the automatic __init__."""
+import datetime
+
 import pytest
 
 import zninit
@@ -92,11 +94,36 @@ class ChildClsInit(ParentCls):
         self.value = value
 
 
+class FreezeTimeDescriptor(Descriptor):
+    """A descriptor that freezes the time when it is set."""
+
+    def __set__(self, instance, value):
+        """Set the value."""
+        return super().__set__(instance, datetime.datetime.now())
+
+
+class PriorityKwargs(ZnInit):
+    """Test class for '_priority_kwargs_'."""
+
+    _priority_kwargs_ = ["a", "c", "b"]
+
+    a: int = FreezeTimeDescriptor()
+    b: int = FreezeTimeDescriptor()
+    c: int = FreezeTimeDescriptor()
+    d: int = FreezeTimeDescriptor()
+
+
+def test_PriorityKwargs():
+    """Test '_priority_kwargs' order works."""
+    x = PriorityKwargs(a=1, b=2, c=3, d=4)
+    assert x.a < x.c < x.b < x.d
+
+
 def test_ParentClsPlain():
     """ZnInit Test."""
     _ = ParentClsPlain()
     with pytest.raises(TypeError):
-        _ = ParentClsPlain(paramter=10)
+        _ = ParentClsPlain(parameter=10)
 
 
 def test_ChildPlainCls():

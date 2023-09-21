@@ -88,7 +88,7 @@ def _handle_args(args, kwargs, kwarg_names, cls_name):
             kwargs[kwarg_names[idx]] = arg_value
 
 
-def get_auto_init(
+def get_auto_init(  # noqa: C901
     kwargs_no_default: typing.List[str],
     kwargs_with_default: dict,
     super_init: typing.Callable,
@@ -114,10 +114,18 @@ def get_auto_init(
     kwargs_no_default = [] if kwargs_no_default is None else kwargs_no_default
     kwargs_with_default = {} if kwargs_with_default is None else kwargs_with_default
 
-    def auto_init(self, *args, **kwargs):
+    def auto_init(self, *args, **kwargs):  # noqa: C901
         """Wrap the __init__ method to generate automatic keyword arguments."""
         init_kwargs = {}
         required_keys = []
+        priority_kwargs = []
+
+        if self._priority_kwargs_ is not None:
+            for key in self._priority_kwargs_:
+                if key in kwargs:
+                    setattr(self, key, kwargs.pop(key))
+                    priority_kwargs.append(key)
+
         uses_auto_init = getattr(self.__init__, "uses_auto_init", False)
         cls_name = self.__class__.__name__
         if args and not allow_args:
@@ -131,7 +139,8 @@ def get_auto_init(
             try:  # pylint: disable=R8203
                 init_kwargs[kwarg_name] = kwargs.pop(kwarg_name)
             except KeyError:
-                required_keys.append(kwarg_name)
+                if kwarg_name not in priority_kwargs:
+                    required_keys.append(kwarg_name)
 
         init_kwargs.update(
             {name: kwargs.pop(name, value) for name, value in kwargs_with_default.items()}
@@ -263,11 +272,17 @@ class ZnInit:  # pylint: disable=R0903
         __init__ method. If the __init__ of this class is reached when iterating
         over the mro, an automatic __init__ method will be generated and the
         __init__ of the basecls will be called via super.
+    _priority_kwargs_: list[str]
+        A list of kwargs that should be prioritized in the __init__.
+        These kwargs will be set in the given order before
+        the other args / kwargs are set.
     """
 
     init_descriptors: typing.List[Descriptor] = [Descriptor]
     use_repr: bool = True
     init_subclass_basecls = None
+
+    _priority_kwargs_: typing.List[str] = None
 
     @property
     def _init_descriptors_(self) -> typing.List[Descriptor]:
