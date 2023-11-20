@@ -1,4 +1,5 @@
 """Unit tests for 'ZnInit'."""
+
 import collections.abc
 import sys
 import typing

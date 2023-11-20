@@ -1,4 +1,5 @@
 """Test for the automatic __init__."""
+
 import datetime
 
 import pytest

@@ -1,4 +1,5 @@
 """Test ZnInit descriptors."""
+
 import pytest
 
 from zninit import Descriptor, get_descriptors

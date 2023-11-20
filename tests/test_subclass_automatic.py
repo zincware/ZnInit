@@ -1,4 +1,5 @@
 """Test subclass handling."""
+
 import pytest
 
 from zninit import Descriptor, ZnInit

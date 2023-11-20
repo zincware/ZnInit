@@ -1,4 +1,5 @@
 """ZnInit Package for automatic __init__ generation."""
+
 import importlib.metadata
 
 from zninit.core import ZnInit
