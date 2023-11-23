@@ -1,4 +1,5 @@
 """'ZnInit' unit tests."""
+
 from zninit import Descriptor, ZnInit
 from zninit.core import _get_auto_init_kwargs, get_args_type_error, get_init_type_error
 

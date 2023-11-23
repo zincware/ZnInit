@@ -1,4 +1,5 @@
 """General 'ZnInit' integration tests."""
+
 import pytest
 
 import zninit

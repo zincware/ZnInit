@@ -1,4 +1,5 @@
 """Definition and utils for the Descriptor class."""
+
 from __future__ import annotations
 
 import contextlib
