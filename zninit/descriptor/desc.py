@@ -4,17 +4,17 @@ from zninit.descriptor import Descriptor, Empty
 
 
 def desc(
-        default=Empty,
-        owner=None,
-        instance=None,
-        name="",
-        use_repr: bool = True,
-        repr_func: Callable = repr,
-        check_types: bool = False,
-        metadata: Optional[dict] = None,
-        frozen: bool = False,
-        on_setattr: Optional[Callable] = None,
-    ):
+    default=Empty,
+    owner=None,
+    instance=None,
+    name="",
+    use_repr: bool = True,
+    repr_func: Callable = repr,
+    check_types: bool = False,
+    metadata: Optional[dict] = None,
+    frozen: bool = False,
+    on_setattr: Optional[Callable] = None,
+):
     """Factory function that creates a Descriptor object.
 
     Forwards all arguments to the Descriptor.__init__ method.
