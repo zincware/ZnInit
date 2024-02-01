@@ -16,7 +16,7 @@ def desc(
         metadata: Optional[dict] = None,
         frozen: bool = False,
         on_setattr: Optional[Callable] = None,
-    ):
+):
     """Create a Descriptor object.
 
     Forwards all arguments to the Descriptor.__init__ method.

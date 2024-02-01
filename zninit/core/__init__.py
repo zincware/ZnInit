@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import logging
+import sys
 import typing
 from copy import deepcopy
 from inspect import Parameter, Signature
 
 from zninit.descriptor import Descriptor, Empty, get_descriptors
 
-import sys
 if sys.version_info >= (3, 11):
     from typing import dataclass_transform
 else:
