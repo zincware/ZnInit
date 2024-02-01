@@ -13,6 +13,7 @@ from zninit.descriptor import Descriptor, Empty, get_descriptors
 if sys.version_info >= (3, 11):
     from typing import dataclass_transform
 else:
+
     def dataclass_transform(*args, **kwargs):
         """Empty decorator for Python < 3.11 support"""
 
@@ -20,6 +21,7 @@ else:
             return func
 
         return decorator
+
 
 log = logging.getLogger(__name__)
 

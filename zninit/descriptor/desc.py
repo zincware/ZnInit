@@ -6,16 +6,16 @@ from zninit.descriptor import Descriptor, Empty
 
 
 def desc(
-        default=Empty,
-        owner=None,
-        instance=None,
-        name="",
-        use_repr: bool = True,
-        repr_func: Callable = repr,
-        check_types: bool = False,
-        metadata: Optional[dict] = None,
-        frozen: bool = False,
-        on_setattr: Optional[Callable] = None,
+    default=Empty,
+    owner=None,
+    instance=None,
+    name="",
+    use_repr: bool = True,
+    repr_func: Callable = repr,
+    check_types: bool = False,
+    metadata: Optional[dict] = None,
+    frozen: bool = False,
+    on_setattr: Optional[Callable] = None,
 ):
     """Create a Descriptor object.
 
