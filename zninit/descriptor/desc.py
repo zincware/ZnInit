@@ -1,3 +1,5 @@
+"""Provide a typed factory function for descriptors."""
+
 from typing import Callable, Optional
 
 from zninit.descriptor import Descriptor, Empty
@@ -15,7 +17,7 @@ def desc(
         frozen: bool = False,
         on_setattr: Optional[Callable] = None,
     ):
-    """Factory function that creates a Descriptor object.
+    """Create a Descriptor object.
 
     Forwards all arguments to the Descriptor.__init__ method.
     The return type is annotated as the type of the managed attribute

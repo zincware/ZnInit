@@ -13,7 +13,13 @@ import sys
 if sys.version_info >= (3, 11):
     from typing import dataclass_transform
 else:
-    from typing_extensions import dataclass_transform
+    def dataclass_transform(*args, **kwargs):
+        """Empty decorator for Python < 3.11 support"""
+
+        def decorator(func):
+            return func
+
+        return decorator
 
 log = logging.getLogger(__name__)
 
