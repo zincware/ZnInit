@@ -9,6 +9,12 @@ from inspect import Parameter, Signature
 
 from zninit.descriptor import Descriptor, Empty, get_descriptors
 
+import sys
+if sys.version_info >= (3, 11):
+    from typing import dataclass_transform
+else:
+    from typing_extensions import dataclass_transform
+
 log = logging.getLogger(__name__)
 
 
@@ -258,6 +264,7 @@ def _get_auto_init_signature(cls) -> typing.Tuple[list, dict, list]:
     return signature_params
 
 
+@dataclass_transform(field_specifiers=(Descriptor,))
 class ZnInit:  # pylint: disable=R0903
     """Parent class for automatic __init__ generation based on descriptors.
 

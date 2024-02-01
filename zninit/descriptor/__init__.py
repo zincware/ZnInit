@@ -56,9 +56,9 @@ class Descriptor:  # pylint: disable=too-many-instance-attributes
         use_repr: bool = True,
         repr_func: typing.Callable = repr,
         check_types: bool = False,
-        metadata: dict = None,
+        metadata: typing.Optional[dict] = None,
         frozen: bool = False,
-        on_setattr: typing.Callable = None,
+        on_setattr: typing.Optional[typing.Callable] = None,
     ):  # pylint: disable=too-many-arguments
         """Define a Descriptor object.
 
