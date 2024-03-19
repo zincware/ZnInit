@@ -3,14 +3,15 @@
 from __future__ import annotations
 
 import contextlib
+import enum
 import functools
 import sys
 import typing
 import weakref
-import enum
 
 with contextlib.suppress(ImportError):
     import typeguard
+
 
 # See https://github.com/python/cpython/blob/main/Lib/dataclasses.py#L181.
 class _Empty_TYPE(enum.Enum):  # pylint: disable=too-few-public-methods
@@ -19,7 +20,9 @@ class _Empty_TYPE(enum.Enum):  # pylint: disable=too-few-public-methods
     When checking if something has a default we can not use 'value is None'
     because 'None' could be the default. Therefore, we use 'value is zninit.Empty'
     """
+
     Empty = enum.auto()
+
 
 Empty = _Empty_TYPE.Empty
 
