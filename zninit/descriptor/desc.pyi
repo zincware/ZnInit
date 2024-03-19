@@ -1,6 +1,6 @@
-from typing import Any, Callable, Optional, TypeVar, overload
+from typing import Any, Callable, Optional, TypeVar, overload, Literal
 
-from zninit.descriptor import Empty
+from zninit.descriptor import _Empty_TYPE
 
 _T = TypeVar("_T")
 
@@ -15,7 +15,7 @@ _T = TypeVar("_T")
 # The actual type will be inferred from the annotation in the class.
 @overload
 def desc(
-    default: Empty = ...,
+    default: Literal[_Empty_TYPE.Empty] = ...,
     owner=...,
     instance=...,
     name=...,
