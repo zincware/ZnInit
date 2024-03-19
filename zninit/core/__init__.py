@@ -3,11 +3,25 @@
 from __future__ import annotations
 
 import logging
+import sys
 import typing
 from copy import deepcopy
 from inspect import Parameter, Signature
 
 from zninit.descriptor import Descriptor, Empty, get_descriptors
+
+if sys.version_info >= (3, 11):
+    from typing import dataclass_transform
+else:
+
+    def dataclass_transform(*args, **kwargs):
+        """Empty decorator for Python < 3.11 support."""
+
+        def decorator(func):
+            return func
+
+        return decorator
+
 
 log = logging.getLogger(__name__)
 
@@ -258,6 +272,7 @@ def _get_auto_init_signature(cls) -> typing.Tuple[list, dict, list]:
     return signature_params
 
 
+@dataclass_transform(field_specifiers=(Descriptor,))
 class ZnInit:  # pylint: disable=R0903
     """Parent class for automatic __init__ generation based on descriptors.
 
