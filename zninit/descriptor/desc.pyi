@@ -1,4 +1,4 @@
-from typing import Any, Callable, Optional, TypeVar, overload, Literal
+from typing import Any, Callable, Literal, Optional, TypeVar, overload
 
 from zninit.descriptor import _Empty_TYPE
 
