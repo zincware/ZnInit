@@ -86,6 +86,7 @@ class Descriptor:  # pylint: disable=too-many-instance-attributes
         on_setattr: Callable, default=None
             A callable that is run whenever an attribute is set via 'class.myattr = value'
              or 'setattr(class, "mattr", value)'.
+
         """
         self._default = default
         self._owner = owner
@@ -140,6 +141,7 @@ class Descriptor:  # pylint: disable=too-many-instance-attributes
         ------
         KeyError:
             if type checking and the descriptor has no annotation.
+
         """
         try:
             annotations_ = self.owner.__annotations__
@@ -164,6 +166,7 @@ class Descriptor:  # pylint: disable=too-many-instance-attributes
         Raises
         ------
         AttributeError: if the value is not in the instance.__dict__ or in self.default
+
         """
         self._instance = instance
         if instance is None:
