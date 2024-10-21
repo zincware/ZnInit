@@ -75,6 +75,7 @@ def _handle_args(args, kwargs, kwarg_names, cls_name):
     TypeError
         if more positional arguments are given than keyword arguments
         if a keyword argument is given multiple times
+
     """
     if len(args) > len(kwarg_names):
         raise TypeError(
@@ -111,6 +112,7 @@ def get_auto_init(  # noqa: C901
         typically this is Node.__init__
     allow_args: bool
         allow args in the __init__. Otherwise only kwargs are allowed
+
     """
     kwargs_no_default = [] if kwargs_no_default is None else kwargs_no_default
     kwargs_with_default = {} if kwargs_with_default is None else kwargs_with_default
@@ -143,9 +145,9 @@ def get_auto_init(  # noqa: C901
                 if kwarg_name not in priority_kwargs:
                     required_keys.append(kwarg_name)
 
-        init_kwargs.update({
-            name: kwargs.pop(name, value) for name, value in kwargs_with_default.items()
-        })
+        init_kwargs.update(
+            {name: kwargs.pop(name, value) for name, value in kwargs_with_default.items()}
+        )
         super_init(self, **kwargs)  # call the super_init explicitly instead of super
         # must call the super_init first e.g. it is required to set the node_name
 
@@ -238,6 +240,7 @@ def _get_auto_init_signature(cls) -> typing.Tuple[list, dict, list]:
         kwargs_with_default: dict
             a dict of {name: default} that will be converted to kwargs
         signature_params: inspect.Parameter
+
     """
     signature_params = []
     cls_annotations = cls.__annotations__  # pylint: disable=no-member
@@ -277,6 +280,7 @@ class ZnInit:  # pylint: disable=R0903
         A list of kwargs that should be prioritized in the __init__.
         These kwargs will be set in the given order before
         the other args / kwargs are set.
+
     """
 
     init_descriptors: typing.List[Descriptor] = [Descriptor]
@@ -305,6 +309,7 @@ class ZnInit:  # pylint: disable=R0903
         Raises
         ------
         TypeError: ZnInit.__init__() got an unexpected keyword argument ...
+
         """
 
     def __init_subclass__(cls, allow_args: bool = True, **kwargs):
